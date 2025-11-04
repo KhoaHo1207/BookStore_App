@@ -112,7 +112,10 @@ export default function Profile() {
   };
 
   const renderBookItem = ({ item }: { item: BookType }) => (
-    <View style={styles.bookItem}>
+    <TouchableOpacity
+      style={styles.bookItem}
+      onPress={() => router.push(`/book/${item._id}`)}
+    >
       <Image source={item.image} style={styles.bookImage} />
       <View style={styles.bookInfo}>
         <Text style={styles.bookTitle}>{item.title}</Text>
@@ -137,7 +140,7 @@ export default function Profile() {
           <Ionicons name="trash-outline" size={20} color={COLORS.primary} />
         )}
       </TouchableOpacity>
-    </View>
+    </TouchableOpacity>
   );
 
   const handleRefresh = async () => {

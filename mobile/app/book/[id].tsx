@@ -1,24 +1,17 @@
-import { useEffect, useState } from "react";
-import {
-  View,
-  Text,
-  ScrollView,
-  TouchableOpacity,
-  ActivityIndicator,
-  Alert,
-} from "react-native";
-import { useLocalSearchParams, useRouter } from "expo-router";
 import { Ionicons } from "@expo/vector-icons";
-import { Image } from "expo-image";
 import axios from "axios";
+import { Image } from "expo-image";
+import { useLocalSearchParams, useRouter } from "expo-router";
+import { useEffect, useState } from "react";
+import { Alert, ScrollView, Text, TouchableOpacity, View } from "react-native";
 
-import { API_URL } from "../../constants/api";
-import { useAuthStore } from "../../store/authStore";
-import COLORS from "../../constants/colors";
+import { BookType } from "@/types";
 import styles from "../../assets/styles/bookDetail.styles";
 import Loader from "../../components/Loader";
+import { API_URL } from "../../constants/api";
+import COLORS from "../../constants/colors";
 import { formatPublishDate } from "../../lib/utils";
-import { BookType } from "@/types";
+import { useAuthStore } from "../../store/authStore";
 
 export default function BookDetail() {
   const { id } = useLocalSearchParams<{ id: string }>();
@@ -71,16 +64,14 @@ export default function BookDetail() {
 
   return (
     <ScrollView style={styles.container}>
-      {/* Header */}
       <View style={styles.header}>
         <TouchableOpacity onPress={() => router.back()}>
           <Ionicons name="arrow-back" size={24} color={COLORS.primary} />
         </TouchableOpacity>
         <Text style={styles.headerTitle}>Book Detail</Text>
-        <View style={{ width: 24 }} /> {/* placeholder for spacing */}
+        <View style={{ width: 24 }} />
       </View>
 
-      {/* Image */}
       <View style={styles.imageContainer}>
         <Image
           source={book.image}
@@ -90,7 +81,6 @@ export default function BookDetail() {
         />
       </View>
 
-      {/* Info */}
       <View style={styles.infoContainer}>
         <Text style={styles.title}>{book.title}</Text>
         <View style={styles.ratingRow}>
@@ -101,7 +91,6 @@ export default function BookDetail() {
         <Text style={styles.caption}>{book.caption}</Text>
       </View>
 
-      {/* Author */}
       <View style={styles.userSection}>
         <Image
           source={{ uri: book.user?.profileImage }}
@@ -110,7 +99,6 @@ export default function BookDetail() {
         <Text style={styles.username}>{book.user?.username}</Text>
       </View>
 
-      {/* CTA */}
       <View style={styles.actionRow}>
         <TouchableOpacity style={styles.actionButton}>
           <Ionicons name="heart-outline" size={20} color={COLORS.primary} />
