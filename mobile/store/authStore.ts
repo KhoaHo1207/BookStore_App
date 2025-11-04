@@ -41,6 +41,7 @@ export const useAuthStore = create<AuthState>((set, get) => ({
       });
 
       const res: ApiResponseType<AuthData> = await response.json();
+
       if (!response.ok || !res.success)
         throw new Error(res.message || "Registration failed");
 
@@ -72,6 +73,8 @@ export const useAuthStore = create<AuthState>((set, get) => ({
       });
 
       const res: ApiResponseType<AuthData> = await response.json();
+      console.log(res);
+
       if (!response.ok || !res.success)
         throw new Error(res.message || "Login failed");
 

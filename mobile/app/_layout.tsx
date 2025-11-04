@@ -42,7 +42,7 @@ export default function RootLayout() {
     if (!isSignedIn && !inAuthGroup) {
       router.replace("/(auth)/signin");
     } else if (isSignedIn && inAuthGroup) {
-      router.replace("/(tabs)");
+      router.replace("/(tabs)/index");
     }
   }, [user, token, segments, isAppReady, isCheckingAuth]);
 

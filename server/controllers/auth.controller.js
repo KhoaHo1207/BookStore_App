@@ -87,6 +87,12 @@ const login = async (req, res) => {
       message: "Login successful",
       data: {
         token,
+        user: {
+          _id: user._id,
+          email: user.email,
+          username: user.username,
+          profileImage: user.profileImage,
+        },
       },
     });
   } catch (error) {

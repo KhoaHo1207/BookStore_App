@@ -3,8 +3,7 @@ export interface UserType {
   username: string;
   email: string;
   profileImage?: string;
-  createdAt?: string;
-  updatedAt?: string;
+  createdAt: string;
 }
 
 export interface ApiResponseType<T> {
