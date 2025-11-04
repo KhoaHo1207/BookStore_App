@@ -20,21 +20,6 @@ const createBook = async (req, res) => {
       });
     }
 
-    // let uploadResponse;
-    // try {
-    //   uploadResponse = await cloudinary.uploader.upload(image, {
-    //     folder: "books",
-    //     resource_type: "image",
-    //     transformation: [{ width: 800, crop: "limit" }],
-    //   });
-    // } catch (uploadErr) {
-    //   console.error("Cloudinary upload error:", uploadErr);
-    //   return res.status(502).json({
-    //     success: false,
-    //     message: "Image upload failed",
-    //   });
-    // }
-
     const newBook = await Book.create({
       title: title.trim(),
       caption: caption.trim(),
@@ -116,6 +101,7 @@ const getBook = async (req, res) => {
     });
   }
 };
+
 const deleteBook = async (req, res) => {
   try {
     const bookId = req.params.id;
@@ -156,4 +142,28 @@ const deleteBook = async (req, res) => {
     });
   }
 };
-module.exports = { createBook, getBooks, getBook, deleteBook };
+
+const getMyBooks = async (req, res) => {
+  try {
+    const userId = req?.user?._id;
+    if (!userId) {
+      return res.status(401).json({
+        success: false,
+        message: "Unauthorized: Missing user ID",
+      });
+    }
+    const books = await Book.find({ user: userId }).sort({ createdAt: -1 });
+    return res.status(200).json({
+      success: true,
+      message: "User's books fetched successfully",
+      data: books,
+    });
+  } catch (error) {
+    console.log("Server error fetching user's books:", error);
+    return res.status(500).json({
+      success: false,
+      message: "Internal server error",
+    });
+  }
+};
+module.exports = { createBook, getBooks, getBook, deleteBook, getMyBooks };

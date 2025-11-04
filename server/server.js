@@ -6,7 +6,7 @@ const app = express();
 const PORT = process.env.PORT || 8080;
 
 //Express hiểu body JSON
-app.use(express.json());
+app.use(express.json({ limit: "10mb" }));
 //Form-urlencoded (VD: từ HTML form)
 app.use(express.urlencoded({ extended: true }));
 

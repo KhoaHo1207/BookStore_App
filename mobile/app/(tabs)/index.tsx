@@ -3,12 +3,13 @@ import {
   FlatList,
   RefreshControl,
   Text,
+  TouchableOpacity,
   View,
 } from "react-native";
 import { useAuthStore } from "../../store/authStore";
-
 import { Image } from "expo-image";
 import { useEffect, useState } from "react";
+import axios from "axios";
 
 import { BookType } from "@/types";
 import { Ionicons } from "@expo/vector-icons";
@@ -17,13 +18,14 @@ import Loader from "../../components/Loader";
 import { API_URL } from "../../constants/api";
 import COLORS from "../../constants/colors";
 import { formatPublishDate } from "../../lib/utils";
+import { router } from "expo-router";
 
-export const sleep = (ms: any) =>
+export const sleep = (ms: number) =>
   new Promise((resolve) => setTimeout(resolve, ms));
 
 export default function Home() {
   const { token } = useAuthStore();
-  const [books, setBooks] = useState([]);
+  const [books, setBooks] = useState<BookType[]>([]);
   const [loading, setLoading] = useState(true);
   const [refreshing, setRefreshing] = useState(false);
   const [page, setPage] = useState(1);
@@ -34,22 +36,13 @@ export default function Home() {
       if (refresh) setRefreshing(true);
       else if (pageNum === 1) setLoading(true);
 
-      const response = await fetch(`${API_URL}/book?page=${pageNum}&limit=2`, {
+      const res = await axios.get(`${API_URL}/book`, {
         headers: { Authorization: `Bearer ${token}` },
+        params: { page: pageNum, limit: 2 },
+        timeout: 10000,
       });
 
-      const contentType = response.headers.get("content-type") || "";
-      if (!contentType.includes("application/json")) {
-        const text = await response.text();
-        console.error("Server did not return JSON:", text.slice(0, 200));
-        throw new Error("Server response is not JSON (maybe HTML error page)");
-      }
-
-      const res = await response.json();
-      const data = res?.data;
-
-      if (!response.ok)
-        throw new Error(res?.message || "Failed to fetch books");
+      const data = res.data?.data;
 
       if (!data || !Array.isArray(data.books)) {
         throw new Error("Invalid response format — missing data.books");
@@ -65,8 +58,11 @@ export default function Home() {
       setBooks(mergedBooks);
       setHasMore(pageNum < (data.totalPages || 1));
       setPage(pageNum);
-    } catch (error) {
-      console.error("Error fetching books:", error);
+    } catch (error: any) {
+      console.error(
+        "Error fetching books:",
+        error.response?.data || error.message
+      );
     } finally {
       if (refresh) {
         await sleep(800);
@@ -87,8 +83,27 @@ export default function Home() {
     }
   };
 
+  const renderRatingStars = (rating: number) => {
+    const stars = [];
+    for (let i = 1; i <= 5; i++) {
+      stars.push(
+        <Ionicons
+          key={i}
+          name={i <= rating ? "star" : "star-outline"}
+          size={16}
+          color={i <= rating ? "#f4b400" : COLORS.textSecondary}
+          style={{ marginRight: 2 }}
+        />
+      );
+    }
+    return stars;
+  };
+
   const renderItem = ({ item }: { item: BookType }) => (
-    <View style={styles.bookCard}>
+    <TouchableOpacity
+      style={styles.bookCard}
+      onPress={() => router.push(`book/${item._id}`)}
+    >
       <View style={styles.bookHeader}>
         <View style={styles.userInfo}>
           <Image
@@ -117,24 +132,8 @@ export default function Home() {
           Shared on {formatPublishDate(item.createdAt)}
         </Text>
       </View>
-    </View>
+    </TouchableOpacity>
   );
-
-  const renderRatingStars = (rating: number) => {
-    const stars = [];
-    for (let i = 1; i <= 5; i++) {
-      stars.push(
-        <Ionicons
-          key={i}
-          name={i <= rating ? "star" : "star-outline"}
-          size={16}
-          color={i <= rating ? "#f4b400" : COLORS.textSecondary}
-          style={{ marginRight: 2 }}
-        />
-      );
-    }
-    return stars;
-  };
 
   if (loading) return <Loader />;
 
