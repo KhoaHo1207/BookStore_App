@@ -5,8 +5,8 @@ export default function Index() {
   return (
     <View style={styles.container}>
       <Text>Hello</Text>
-      <Link href="/(atuh)/signin">Sign In</Link>
-      <Link href="/(atuh)/signup">Sign Up</Link>
+      <Link href="/(auth)/signin">Sign In</Link>
+      <Link href="/(auth)/signup">Sign Up</Link>
     </View>
   );
 }
