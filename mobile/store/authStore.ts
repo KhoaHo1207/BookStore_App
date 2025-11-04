@@ -94,19 +94,36 @@ export const useAuthStore = create<AuthState>((set, get) => ({
   },
 
   checkAuth: async () => {
+    set({ isCheckingAuth: true });
     try {
       const [tokenPair, userPair] = await AsyncStorage.multiGet([
         "token",
         "user",
       ]);
 
-      const token = tokenPair[1];
-      const userJson = userPair[1];
-      const user = userJson ? JSON.parse(userJson) : null;
+      const token = tokenPair?.[1] || null;
+      const userJson = userPair?.[1];
 
-      set({ token, user });
+      let user = null;
+
+      if (userJson) {
+        try {
+          user = JSON.parse(userJson);
+        } catch (parseError) {
+          console.warn("Failed to parse user JSON:", parseError);
+          await AsyncStorage.removeItem("user");
+        }
+      }
+
+      if (token && user) {
+        set({ token, user });
+        console.log("Auth restored from storage");
+      } else {
+        set({ token: null, user: null });
+        console.log("No valid auth found in storage");
+      }
     } catch (error) {
-      console.error("Auth check failed:", error);
+      console.error("checkAuth failed:", error);
       set({ token: null, user: null });
     } finally {
       set({ isCheckingAuth: false });

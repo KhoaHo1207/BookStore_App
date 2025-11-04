@@ -17,7 +17,7 @@ import COLORS from "../../constants/colors";
 
 import { useAuthStore } from "../../store/authStore";
 
-export default function Login() {
+export default function SignInScreen() {
   const [email, setEmail] = useState("");
   const [password, setPassword] = useState("");
   const [showPassword, setShowPassword] = useState(false);
