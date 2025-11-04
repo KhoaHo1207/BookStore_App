@@ -20,25 +20,25 @@ const createBook = async (req, res) => {
       });
     }
 
-    let uploadResponse;
-    try {
-      uploadResponse = await cloudinary.uploader.upload(image, {
-        folder: "books",
-        resource_type: "image",
-        transformation: [{ width: 800, crop: "limit" }],
-      });
-    } catch (uploadErr) {
-      console.error("Cloudinary upload error:", uploadErr);
-      return res.status(502).json({
-        success: false,
-        message: "Image upload failed",
-      });
-    }
+    // let uploadResponse;
+    // try {
+    //   uploadResponse = await cloudinary.uploader.upload(image, {
+    //     folder: "books",
+    //     resource_type: "image",
+    //     transformation: [{ width: 800, crop: "limit" }],
+    //   });
+    // } catch (uploadErr) {
+    //   console.error("Cloudinary upload error:", uploadErr);
+    //   return res.status(502).json({
+    //     success: false,
+    //     message: "Image upload failed",
+    //   });
+    // }
 
     const newBook = await Book.create({
       title: title.trim(),
       caption: caption.trim(),
-      image: uploadResponse.secure_url,
+      image: image,
       rating,
       user: userId,
     });

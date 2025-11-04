@@ -11,3 +11,13 @@ export interface ApiResponseType<T> {
   message: string;
   data?: T;
 }
+
+export interface BookType {
+  title: string;
+  caption: string;
+  image: string;
+  rating: number;
+  user: UserType;
+  createdAt: string;
+  _id: string;
+}
