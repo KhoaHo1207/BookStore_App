@@ -57,4 +57,103 @@ const createBook = async (req, res) => {
   }
 };
 
-module.exports = { createBook };
+const getBooks = async (req, res) => {
+  try {
+    const page = req.params.page || 1;
+    const limit = req.params.limit || 10;
+    const skip = (page - 1) * limit;
+    const books = await Book.find()
+      .sort({ createdAt: -1 })
+      .skip(skip)
+      .limit(limit)
+      .populate("user", "username email profileImage");
+
+    const totalBooks = await Book.countDocuments();
+    const totalPages = Math.ceil(totalBooks / limit);
+    return res.status(200).json({
+      success: true,
+      message: "Books fetched successfully",
+      data: {
+        books,
+        currentPage: Number(page),
+        limit: Number(limit),
+        totalBooks: totalBooks,
+        totalPages: totalPages,
+      },
+    });
+  } catch (error) {
+    console.log("Server error fetching books:", error);
+    return res.status(500).json({
+      success: false,
+      message: "Internal server error",
+    });
+  }
+};
+
+const getBook = async (req, res) => {
+  try {
+    const bookId = req.params.id;
+    const book = await Book.findById(bookId).populate(
+      "user",
+      "username email profileImage"
+    );
+    if (!book) {
+      return res.status(404).json({
+        success: false,
+        message: "Book not found",
+      });
+    }
+    return res.status(200).json({
+      success: true,
+      message: "Book fetched successfully",
+      data: book,
+    });
+  } catch (error) {
+    console.log("Server error fetching book:", error);
+    return res.status(500).json({
+      success: false,
+      message: "Internal server error",
+    });
+  }
+};
+const deleteBook = async (req, res) => {
+  try {
+    const bookId = req.params.id;
+    const userId = req?.user?._id;
+
+    const book = await Book.findById(bookId);
+    if (!book) {
+      return res.status(404).json({
+        success: false,
+        message: "Book not found",
+      });
+    }
+
+    if (book.user.toString() !== userId.toString()) {
+      return res.status(403).json({
+        success: false,
+        message: "Forbidden: You can only delete your own books",
+      });
+    }
+    if (book.image && book.image.includes("cloudinary")) {
+      try {
+        const publicId = Book.image.spilt("/").pop.split(".")[0];
+        await cloudinary.uploader.destroy(publicId);
+      } catch (error) {
+        console.error("Cloudinary deletion error:", error);
+      }
+    }
+    await Book.findByIdAndDelete(bookId);
+    return res.status(200).json({
+      success: true,
+      message: "Book deleted successfully",
+    });
+  } catch (error) {
+    console.log("Server error deleting book:", error);
+    return res.status(500).json({
+      success: false,
+      message: "Internal server error",
+    });
+  }
+};
+module.exports = { createBook, getBooks, getBook, deleteBook };

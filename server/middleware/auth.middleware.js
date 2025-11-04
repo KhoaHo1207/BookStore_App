@@ -23,8 +23,8 @@ const protectRoute = async (req, res, next) => {
         message: "Unauthorized: Invalid token",
       });
     }
-
-    const user = await User.findById(decoded.id).select("-password");
+    console.log("Decoded JWT payload:", decoded);
+    const user = await User.findById(decoded._id).select("-password");
     if (!user) {
       return res.status(401).json({
         success: false,
